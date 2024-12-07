@@ -68,7 +68,7 @@ public struct ScannerzView: UIViewControllerRepresentable {
 
 @available(macCatalyst 14.0, *)
 #Preview {
-    let configuration = ScannerConfig(codeTypes: [.qr], mode: .once, allowTorchToggle: false, overlayForView: "", overlayForCode: "")
+    let configuration = ScannerConfig(codeTypes: [.qr], mode: .once, allowTorchToggle: false)
     ScannerzView(configuration: configuration) { result in
         // do nothing
     }
