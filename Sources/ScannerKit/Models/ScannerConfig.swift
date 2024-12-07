@@ -16,7 +16,7 @@ public struct ScannerConfig {
     public let allowTorchToggle: Bool
 //    public let successHaptics: CHHapticEvent?
 
-    init(codeTypes: [AVMetadataObject.ObjectType], mode: ScanMode, allowTorchToggle: Bool) {
+    public init(codeTypes: [AVMetadataObject.ObjectType], mode: ScanMode, allowTorchToggle: Bool) {
         self.codeTypes = codeTypes
         self.mode = mode
         self.allowTorchToggle = allowTorchToggle
