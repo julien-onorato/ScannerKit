@@ -15,6 +15,4 @@ public struct ScannerConfig {
     public let mode: ScanMode
     public let allowTorchToggle: Bool
 //    public let successHaptics: CHHapticEvent?
-    let overlayForView: String
-    let overlayForCode: String
 }
