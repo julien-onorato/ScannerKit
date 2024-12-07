@@ -318,9 +318,7 @@ struct SimulatorOverlay: View {
     let configuration = ScannerConfig(
         codeTypes: [.qr], 
         mode: .once,
-        allowTorchToggle: false,
-        overlayForView: "",
-        overlayForCode: ""
+        allowTorchToggle: false
     )
     
     ScannerView(configuration: configuration) { result in
