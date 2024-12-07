@@ -10,7 +10,7 @@ import AVFoundation
 import SwiftUI
 import CoreHaptics
 
-public struct ScannerConfig {
+open struct ScannerConfig {
     public let codeTypes: [AVMetadataObject.ObjectType]
     public let mode: ScanMode
     public let allowTorchToggle: Bool
