@@ -2,14 +2,13 @@
 //  ScannerView.swift
 //  ScannerKit
 //
-//  Created by Julien Onorato on 07/12/2024.
+//  Created by Julien Onorato on 14/12/2024.
 //
-
 
 import SwiftUI
 import AVFoundation
 
-@available(iOS 15.0, macCatalyst 14.0, *)
+@available(iOS 15.0, *)
 public struct ScannerView: View {
     @StateObject private var viewModel: ScannerViewModel
     
@@ -18,7 +17,6 @@ public struct ScannerView: View {
         manualSelect: Bool = false,
         scanInterval: Double = 2.0,
         showViewfinder: Bool = false,
-        simulatedData: String = "",
         shouldVibrateOnSuccess: Bool = true,
         isTorchOn: Bool = false,
         isPaused: Bool = false,
@@ -30,7 +28,6 @@ public struct ScannerView: View {
             manualSelect: manualSelect,
             scanInterval: scanInterval,
             showViewfinder: showViewfinder,
-            simulatedData: simulatedData,
             shouldVibrateOnSuccess: shouldVibrateOnSuccess,
             isTorchOn: isTorchOn,
             isPaused: isPaused,
@@ -59,33 +56,25 @@ public struct ScannerView: View {
             if viewModel.permissionDenied {
                 PermissionDeniedView()
             }
-            
-            // Simulator support
-            #if targetEnvironment(simulator)
-            SimulatorOverlay(simulatedData: viewModel.simulatedData, 
-                             completion: viewModel.simulateCodeScan)
-            #endif
         }
         .onAppear(perform: viewModel.checkPermissions)
         .onDisappear(perform: viewModel.stopScanning)
         .gesture(
             TapGesture().onEnded { location in
-//                viewModel.focusCamera(at: location)
+                viewModel.focusCamera(at: .zero)
             }
         )
     }
 }
 
-@available(iOS 15.0, macCatalyst 14.0, *)
-@MainActor
-class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCaptureMetadataOutputObjectsDelegate {
+@available(iOS 15.0, *)
+class ScannerViewModel: NSObject, ObservableObject, AVCaptureMetadataOutputObjectsDelegate {
     @Published var permissionDenied = false
     
     let configuration: ScannerConfig
     let manualSelect: Bool
     let scanInterval: Double
     let showViewfinder: Bool
-    let simulatedData: String
     let shouldVibrateOnSuccess: Bool
     let isTorchOn: Bool
     let isPaused: Bool
@@ -101,7 +90,6 @@ class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCaptureMet
         manualSelect: Bool = false,
         scanInterval: Double = 2.0,
         showViewfinder: Bool = false,
-        simulatedData: String = "",
         shouldVibrateOnSuccess: Bool = true,
         isTorchOn: Bool = false,
         isPaused: Bool = false,
@@ -112,7 +100,6 @@ class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCaptureMet
         self.manualSelect = manualSelect
         self.scanInterval = scanInterval
         self.showViewfinder = showViewfinder
-        self.simulatedData = simulatedData
         self.shouldVibrateOnSuccess = shouldVibrateOnSuccess
         self.isTorchOn = isTorchOn
         self.isPaused = isPaused
@@ -122,6 +109,7 @@ class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCaptureMet
         super.init()
     }
     
+    @MainActor
     func checkPermissions() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
@@ -143,6 +131,7 @@ class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCaptureMet
         }
     }
     
+    @MainActor
     private func setupCaptureSession() {
         // Camera setup logic
         guard let videoCaptureDevice = videoCaptureDevice ?? AVCaptureDevice.default(for: .video) else {
@@ -164,17 +153,25 @@ class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCaptureMet
             }
             
             // Start capture session
-            DispatchQueue.main.async {
-                self.captureSession.startRunning()
+            Task { @MainActor in
+                startCaptureSession()
             }
         } catch {
             completion(.failure(.initError(error)))
         }
     }
     
+    @MainActor
+    func startCaptureSession() {
+        if !captureSession.isRunning {
+            captureSession.startRunning()
+        }
+    }
+    
+    @MainActor
     func stopScanning() {
         if captureSession.isRunning {
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.captureSession.stopRunning()
             }
         }
@@ -195,15 +192,6 @@ class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCaptureMet
         } catch {
             print("Error focusing camera: \(error.localizedDescription)")
         }
-    }
-    
-    func simulateCodeScan() {
-        let result = ScanResult(
-            string: simulatedData,
-            type: configuration.codeTypes.first ?? .qr,
-            corners: []
-        )
-        processFoundCode(result)
     }
     
     private func processFoundCode(_ result: ScanResult) {
@@ -249,8 +237,8 @@ class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCaptureMet
         }
         
         let result = ScanResult(
-            string: stringValue, 
-            type: metadataObject.type, 
+            string: stringValue,
+            type: metadataObject.type,
             corners: metadataObject.corners
         )
         processFoundCode(result)
@@ -291,32 +279,9 @@ struct PermissionDeniedView: View {
     }
 }
 
-// Simulator Overlay
-#if targetEnvironment(simulator)
-struct SimulatorOverlay: View {
-    let simulatedData: String
-    let completion: () -> Void
-    
-    var body: some View {
-        VStack {
-            Text("Simulator Mode")
-            Text("Tap to simulate scan of: \(simulatedData)")
-            Button("Simulate Scan") {
-                completion()
-            }
-        }
-        .padding()
-        .background(Color.blue.opacity(0.1))
-        .cornerRadius(10)
-    }
-}
-#endif
-
-// Preview
-@available(iOS 15.0, macCatalyst 14.0, *)
 #Preview {
     let configuration = ScannerConfig(
-        codeTypes: [.qr], 
+        codeTypes: [.qr],
         mode: .once,
         allowTorchToggle: false
     )
