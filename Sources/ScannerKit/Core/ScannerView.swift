@@ -153,7 +153,7 @@ class ScannerViewModel: NSObject, ObservableObject, AVCaptureMetadataOutputObjec
             }
             
             // Start capture session
-            Task { @MainActor in
+            Task {
                 startCaptureSession()
             }
         } catch {
