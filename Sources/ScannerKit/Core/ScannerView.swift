@@ -161,19 +161,15 @@ class ScannerViewModel: NSObject, ObservableObject, AVCaptureMetadataOutputObjec
         }
     }
     
-    @MainActor
     func startCaptureSession() {
         if !captureSession.isRunning {
             captureSession.startRunning()
         }
     }
     
-    @MainActor
     func stopScanning() {
         if captureSession.isRunning {
-            Task { @MainActor in
-                self.captureSession.stopRunning()
-            }
+            self.captureSession.stopRunning()
         }
     }
     
