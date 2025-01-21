@@ -109,19 +109,16 @@ class ScannerViewModel: NSObject, ObservableObject, AVCaptureMetadataOutputObjec
         super.init()
     }
     
-    @MainActor
     func checkPermissions() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             setupCaptureSession()
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
-                DispatchQueue.main.async {
-                    if granted {
-                        self?.setupCaptureSession()
-                    } else {
-                        self?.permissionDenied = true
-                    }
+                if granted {
+                    self?.setupCaptureSession()
+                } else {
+                    self?.permissionDenied = true
                 }
             }
         case .denied, .restricted:
