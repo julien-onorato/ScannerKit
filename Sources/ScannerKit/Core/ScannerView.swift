@@ -131,7 +131,6 @@ class ScannerViewModel: NSObject, ObservableObject, AVCaptureMetadataOutputObjec
         }
     }
     
-    @MainActor
     private func setupCaptureSession() {
         // Camera setup logic
         guard let videoCaptureDevice = videoCaptureDevice ?? AVCaptureDevice.default(for: .video) else {
@@ -153,9 +152,8 @@ class ScannerViewModel: NSObject, ObservableObject, AVCaptureMetadataOutputObjec
             }
             
             // Start capture session
-            Task {
-                startCaptureSession()
-            }
+            startCaptureSession()
+            
         } catch {
             completion(.failure(.initError(error)))
         }
