@@ -110,7 +110,11 @@ struct CameraPreview: UIViewRepresentable {
 public struct ScannerView: View {
     @StateObject private var viewModel = ScannerViewModel()
     
-    public init() {}
+    var completion: ((String) -> Void)
+    
+    public init(completion: @escaping ((String) -> Void)) {
+        self.completion = completion
+    }
     
     public var body: some View {
         ZStack {
@@ -120,27 +124,30 @@ public struct ScannerView: View {
                 .tint(.blue)
             
             // Overlay with the scanned code.
-            VStack {
-                Spacer()
-                Text("Scanned Code: \(viewModel.scannedCode)")
-                    .padding()
-                    .background(Color.black.opacity(0.7))
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-                    .padding(.bottom, 20)
-            }
+//            VStack {
+//                Spacer()
+//                Text("Scanned Code: \(viewModel.scannedCode)")
+//                    .padding()
+//                    .background(Color.black.opacity(0.7))
+//                    .foregroundColor(.white)
+//                    .cornerRadius(8)
+//                    .padding(.bottom, 20)
+//            }
         }
         .onAppear {
-            Task.detached {
+            Task {
                 await viewModel.startSession()
             }
             
         }
         .onDisappear {
-            Task.detached {
+            Task {
                 await viewModel.stopSession()
             }
             
+        }
+        .onChange(of: viewModel.scannedCode) {
+            completion(viewModel.scannedCode)
         }
     }
 }
