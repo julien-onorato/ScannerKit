@@ -112,10 +112,12 @@ struct CameraPreview: UIViewRepresentable {
     }
 }
 
-struct ScannerView: View {
+public struct ScannerView: View {
     @StateObject private var viewModel = ScannerViewModel()
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         ZStack {
             // Display the camera preview.
             CameraPreview(session: viewModel.session)
