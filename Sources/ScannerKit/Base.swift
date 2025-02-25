@@ -51,35 +51,17 @@ final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCapt
     }
     
     func startSession() async {
-        if !session.isRunning {
-            await withCheckedContinuation { continuation in
-                Task.detached { [weak self] in
-                    guard let self = self else { return }
-                    
-                    // Access session on the main actor
-                    await MainActor.run {
-                        self.session.startRunning()
-                    }
-                    
-                    continuation.resume()
-                }
+        DispatchQueue.global(qos: .userInteractive).sync {
+            if !session.isRunning {
+                session.startRunning()
             }
         }
     }
     
     func stopSession() async {
-        if session.isRunning {
-            await withCheckedContinuation { continuation in
-                Task.detached { [weak self] in
-                    guard let self = self else { return }
-                    
-                    // Access session on the main actor
-                    await MainActor.run {
-                        self.session.stopRunning()
-                    }
-                    
-                    continuation.resume()
-                }
+        DispatchQueue.global(qos: .userInteractive).sync {
+            if session.isRunning {
+                session.stopRunning()
             }
         }
     }
@@ -102,25 +84,25 @@ final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCapt
 
 struct CameraPreview: UIViewRepresentable {
     let session: AVCaptureSession
-    
+
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
         previewLayer.videoGravity = .resizeAspectFill
-        
+
         // Set the correct frame size immediately.
         DispatchQueue.main.async {
             previewLayer.frame = view.bounds
         }
-        
+
         view.layer.addSublayer(previewLayer)
-        
+
         return view
     }
-    
+
     func updateUIView(_ uiView: UIView, context: Context) {
         guard let previewLayer = uiView.layer.sublayers?.first as? AVCaptureVideoPreviewLayer else { return }
-        
+
         DispatchQueue.main.async {
             previewLayer.frame = uiView.bounds
         }
@@ -151,13 +133,13 @@ public struct ScannerView: View {
             }
         }
         .onAppear {
-            Task(priority: .background) {
+            Task {
                 await viewModel.startSession()
             }
             
         }
         .onDisappear {
-            Task(priority: .background) {
+            Task {
                 await viewModel.stopSession()
             }
             
