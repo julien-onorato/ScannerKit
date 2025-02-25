@@ -131,13 +131,13 @@ public struct ScannerView: View {
             }
         }
         .onAppear {
-            Task {
+            Task(priority: .background) {
                 await viewModel.startSession()
             }
             
         }
         .onDisappear {
-            Task {
+            Task(priority: .background) {
                 await viewModel.stopSession()
             }
             
