@@ -11,8 +11,6 @@ import SwiftUI
 
 actor CodeScannerProcessor {
     func processScannedCode(_ code: String) async -> String {
-        // Perform any asynchronous processing if needed.
-        // Here we simply forward the code on the main actor.
         return code
     }
 }
@@ -133,13 +131,13 @@ public struct ScannerView: View {
             }
         }
         .onAppear {
-            Task {
+            Task.detached {
                 await viewModel.startSession()
             }
             
         }
         .onDisappear {
-            Task {
+            Task.detached {
                 await viewModel.stopSession()
             }
             
