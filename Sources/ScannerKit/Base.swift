@@ -51,14 +51,18 @@ final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCapt
     }
     
     func startSession() {
-        if !session.isRunning {
-            session.startRunning()
+        Task(priority: .background) {
+            if !session.isRunning {
+                session.startRunning()
+            }
         }
     }
     
     func stopSession() {
-        if session.isRunning {
-            session.stopRunning()
+        Task(priority: .background) {
+            if session.isRunning {
+                session.stopRunning()
+            }
         }
     }
     
