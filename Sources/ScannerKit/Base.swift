@@ -80,31 +80,28 @@ final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCapt
 
 struct CameraPreview: UIViewRepresentable {
     let session: AVCaptureSession
-    
+
     func makeUIView(context: Context) -> UIView {
-        let view = UIView(frame: .zero)
-        
-        // Configure the preview layer.
+        let view = UIView()
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
         previewLayer.videoGravity = .resizeAspectFill
+
+        // Set the correct frame size immediately.
+        DispatchQueue.main.async {
+            previewLayer.frame = view.bounds
+        }
+
         view.layer.addSublayer(previewLayer)
-        
-        // Save the layer reference for updates.
-        context.coordinator.previewLayer = previewLayer
+
         return view
     }
-    
+
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Ensure the preview layer always fills the view.
-        context.coordinator.previewLayer?.frame = uiView.bounds
-    }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator()
-    }
-    
-    class Coordinator {
-        var previewLayer: AVCaptureVideoPreviewLayer?
+        guard let previewLayer = uiView.layer.sublayers?.first as? AVCaptureVideoPreviewLayer else { return }
+
+        DispatchQueue.main.async {
+            previewLayer.frame = uiView.bounds
+        }
     }
 }
 
