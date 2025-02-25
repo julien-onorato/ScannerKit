@@ -51,7 +51,7 @@ final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCapt
     }
     
     func startSession() async {
-        DispatchQueue.global(qos: .userInteractive).sync {
+        DispatchQueue.global(qos: .background).sync {
             if !session.isRunning {
                 session.startRunning()
             }
@@ -59,7 +59,7 @@ final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCapt
     }
     
     func stopSession() async {
-        DispatchQueue.global(qos: .userInteractive).sync {
+        DispatchQueue.global(qos: .background).sync {
             if session.isRunning {
                 session.stopRunning()
             }
