@@ -115,6 +115,7 @@ public struct ScannerView: View {
             // Display the camera preview.
             CameraPreview(session: viewModel.session)
                 .edgesIgnoringSafeArea(.all)
+                .tint(.blue)
             
             // Overlay with the scanned code.
             VStack {
