@@ -8,6 +8,8 @@
 import SwiftUI
 
 public struct ExampleView: View {
+    public init() { }
+    
     public var body: some View {
         ScannerView()
     }
