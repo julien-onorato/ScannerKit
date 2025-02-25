@@ -50,19 +50,15 @@ final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCapt
         metadataOutput.metadataObjectTypes = [.qr, .ean13, .code128] // Add more types if needed.
     }
     
-    func startSession() {
-        Task(priority: .background) {
-            if !session.isRunning {
-                session.startRunning()
-            }
+    func startSession() async {
+        if !session.isRunning {
+            session.startRunning()
         }
     }
     
-    func stopSession() {
-        Task(priority: .background) {
-            if session.isRunning {
-                session.stopRunning()
-            }
+    func stopSession() async {
+        if session.isRunning {
+            session.stopRunning()
         }
     }
     
@@ -135,10 +131,16 @@ public struct ScannerView: View {
             }
         }
         .onAppear {
-            viewModel.startSession()
+            Task {
+                await viewModel.startSession()
+            }
+            
         }
         .onDisappear {
-            viewModel.stopSession()
+            Task {
+                await viewModel.stopSession()
+            }
+            
         }
     }
 }
