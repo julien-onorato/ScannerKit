@@ -74,6 +74,7 @@ final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCapt
             Task { [weak self] in
                 guard let self = self else { return }
                 let processedCode = await self.processor.processScannedCode(code)
+                await self.stopSession()
                 self.scannedCode = processedCode
             }
         }
