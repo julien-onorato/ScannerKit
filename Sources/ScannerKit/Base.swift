@@ -122,7 +122,7 @@ public struct ScannerView: View {
         ZStack {
             // Display the camera preview.
             CameraPreview(session: viewModel.session)
-                .edgesIgnoringSafeArea(.all)
+//                .edgesIgnoringSafeArea(.all)
                 .tint(.blue)
             
             // Overlay with the scanned code.
