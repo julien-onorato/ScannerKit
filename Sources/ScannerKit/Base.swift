@@ -120,21 +120,7 @@ public struct ScannerView: View {
     
     public var body: some View {
         ZStack {
-            // Display the camera preview.
             CameraPreview(session: viewModel.session)
-//                .edgesIgnoringSafeArea(.all)
-                .tint(.blue)
-            
-            // Overlay with the scanned code.
-//            VStack {
-//                Spacer()
-//                Text("Scanned Code: \(viewModel.scannedCode)")
-//                    .padding()
-//                    .background(Color.black.opacity(0.7))
-//                    .foregroundColor(.white)
-//                    .cornerRadius(8)
-//                    .padding(.bottom, 20)
-//            }
         }
         .onAppear {
             Task {
