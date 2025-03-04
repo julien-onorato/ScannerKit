@@ -17,7 +17,7 @@ actor CodeScannerProcessor {
 
 @MainActor
 final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCaptureMetadataOutputObjectsDelegate {
-    @Published var scannedCode: String = ""
+    @Published var scannedCode: String?
     let session = AVCaptureSession()
     let processor = CodeScannerProcessor()
     
@@ -49,7 +49,7 @@ final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCapt
     }
     
     func startSession() async {
-        self.scannedCode = ""
+        self.scannedCode = nil
         DispatchQueue.global(qos: .background).sync {
             if !session.isRunning {
                 session.startRunning()
@@ -147,7 +147,8 @@ public struct ScannerView: View {
             }
         }
         .onChange(of: viewModel.scannedCode) {
-            completion(viewModel.scannedCode)
+            guard let scannedCode = viewModel.scannedCode else { return }
+            completion(scannedCode)
         }
     }
 }
