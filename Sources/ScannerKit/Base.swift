@@ -49,6 +49,7 @@ final class ScannerViewModel: NSObject, ObservableObject, @preconcurrency AVCapt
     }
     
     func startSession() async {
+        self.scannedCode = ""
         DispatchQueue.global(qos: .background).sync {
             if !session.isRunning {
                 session.startRunning()
@@ -139,13 +140,11 @@ public struct ScannerView: View {
             Task {
                 await viewModel.startSession()
             }
-            
         }
         .onDisappear {
             Task {
                 await viewModel.stopSession()
             }
-            
         }
         .onChange(of: viewModel.scannedCode) {
             completion(viewModel.scannedCode)
